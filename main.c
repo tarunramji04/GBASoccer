@@ -17,6 +17,7 @@ enum gba_state {
   STARTTEXT,
   PLAYONE,
   PLAYTWO,
+  PLAYTHREE,
   WIN,
   WINTEXT,
   LOSE,
@@ -36,6 +37,8 @@ int main(void) {
 
   struct ball game_ball = {80, 20, 8, 8};
   struct defender defender_1 = {75, 100, 8, 16};
+  struct defender defender_2 = {60, 210, 8, 16};
+
   int timer = 30;
 
   while (1) {
@@ -52,6 +55,9 @@ int main(void) {
         game_ball.y = 20;
         defender_1.x = 75;
         defender_1.y = 100;
+        defender_2.x = 60;
+        defender_2.y = 210;
+        
         timer = 30;
 
         state = STARTTEXT;
@@ -59,9 +65,10 @@ int main(void) {
         break;
 
       case STARTTEXT: 
-        drawString(80, 18, "Score the soccer ball into the goal", BLACK);
-        drawString(95, 30, "Press enter to play easy mode!", BLACK);
-        drawString(110, 40, "Press z to play hard mode!", BLACK);
+        drawString(70, 18, "Score the soccer ball into the goal", BLACK);
+        drawString(83, 30, "Press enter to play easy mode!", BLACK);
+        drawString(96, 35, "Press z to play medium mode!", BLACK);
+        drawString(109, 40, "Press x to play hard mode!", BLACK);
 
         if (KEY_DOWN(BUTTON_START, currentButtons)) {
           state = PLAYONE;
@@ -69,6 +76,10 @@ int main(void) {
 
         if (KEY_DOWN(BUTTON_A, currentButtons)) {
           state = PLAYTWO;
+        }
+
+        if (KEY_DOWN(BUTTON_B, currentButtons)) {
+          state = PLAYTHREE;
         }
 
         break;
@@ -175,6 +186,65 @@ int main(void) {
         }
 
         break;
+      
+      case PLAYTHREE:
+        waitForVBlank();
+        fillScreenDMA(DARKGREEN);
+        drawRectDMA(15, 0, WIDTH - 20, 1, BLACK);
+        drawRectDMA(145, 0, WIDTH - 20, 1, BLACK);
+        drawRectDMA(15, 220, 2, 45, BLACK);
+        drawRectDMA(100, 220, 2, 45, BLACK);
+        drawImageDMA(game_ball.x, game_ball.y, game_ball.width, game_ball.height, ball);
+        drawImageDMA(defender_1.x, defender_1.y, 8, 16, defender);
+        drawImageDMA(defender_2.x, defender_2.y, 8, 16, defender);
+        drawImageDMA(60, 220, 20, 40, goal);
+
+        if (KEY_DOWN(BUTTON_LEFT, BUTTONS) && game_ball.y > 0) {
+          game_ball.y -=2;
+          defender_1.y -=1;
+        }
+
+        if (KEY_DOWN(BUTTON_RIGHT, BUTTONS) &&
+         ((game_ball.y < WIDTH - game_ball.width - 20) || (game_ball.y < WIDTH - game_ball.width && (game_ball.x > 60 && game_ball.x < 92)))) { 
+          game_ball.y +=2;
+          defender_1.y +=1;
+        }
+
+        if (KEY_DOWN(BUTTON_UP, BUTTONS) && game_ball.x > 16) { 
+          game_ball.x -=2;
+          defender_1.x -=1;
+        }
+
+        if (KEY_DOWN(BUTTON_DOWN, BUTTONS) && game_ball.x < HEIGHT - game_ball.height - 16) { 
+          game_ball.x +=2;
+          defender_1.x +=1;
+        }
+
+        if ((game_ball.y > 212) && (game_ball.x > 60 && game_ball.x < 92)) {
+          state = WIN;
+        }
+
+        if (KEY_DOWN(BUTTON_SELECT, currentButtons)) {
+          state = START;
+        }
+
+        if ((vBlankCounter % 5 == 0) && (defender_2.x > 40)) {
+          defender_2.x += 1;
+        }
+
+        if (vBlankCounter % 60 == 0) {
+          timer--;
+        }
+    
+        char timeThree[30];
+        sprintf(timeThree, "Timer: %d", timer);
+        drawString(150, 5, timeThree, BLACK);
+
+        if (timer == 0 || ((game_ball.x + game_ball.width >= defender_1.x && game_ball.x <= defender_1.x + defender_1.height) && (game_ball.y + game_ball.height >= defender_1.y && game_ball.y <= defender_1.y + defender_1.width))) {
+          state = LOSE;
+        }
+
+        break;
 
       case WIN:
         waitForVBlank();
@@ -217,10 +287,9 @@ int main(void) {
     }
 
     previousButtons = currentButtons; // Store the current state of the buttons
-
-    UNUSED(previousButtons);
   }
+
+  UNUSED(previousButtons);
 
   return 0;
 }
-

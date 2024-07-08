@@ -65,6 +65,29 @@ gdb: debug
 	@echo "          Make sure mGBA is already running on the host machine!"
 	@gdb-multiarch -ex 'file $(PROGNAME).elf' -ex 'target remote host.docker.internal:2345'
 
+.PHONY: submit
+submit: clean
+	@rm -f submission.tar.gz
+	@tar --exclude="examples" -czvf submission.tar.gz *
+
+.PHONY: maze
+maze: client
+	@echo "[EXECUTE] Running emulator mGBA"
+	@echo "          Please see emulator.log if this fails"
+	@./client examples/maze/Maze.gba
+
+.PHONY: mario
+mario: client
+	@echo "[EXECUTE] Running emulator mGBA"
+	@echo "          Please see emulator.log if this fails"
+	@./client examples/mario/Mario.gba
+
+.PHONY: pong
+pong: client
+	@echo "[EXECUTE] Running emulator mGBA"
+	@echo "          Please see emulator.log if this fails"
+	@./client examples/pong/Pong.gba
+
 .PHONY: clean
 clean:
 	@echo "[CLEAN] Removing all compiled files"
