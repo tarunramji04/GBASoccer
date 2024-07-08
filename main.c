@@ -38,8 +38,13 @@ int main(void) {
   struct ball game_ball = {80, 20, 8, 8};
   struct defender defender_1 = {75, 100, 8, 16};
   struct defender defender_2 = {60, 210, 8, 16};
+  struct defender defender_3 = {20, 50, 8, 16};
+  struct defender defender_4 = {125, 50, 8, 16};
 
   int timer = 30;
+  int goalie_direction = 1;
+  int top_defender_direction = 1;
+  int bottom_defender_direction = 1;
 
   while (1) {
     currentButtons = BUTTONS; // Load the current state of the buttons
@@ -57,6 +62,10 @@ int main(void) {
         defender_1.y = 100;
         defender_2.x = 60;
         defender_2.y = 210;
+        defender_3.x = 20;
+        defender_3.y = 50;
+        defender_4.x = 125;
+        defender_4.y = 50;
         
         timer = 30;
 
@@ -197,6 +206,8 @@ int main(void) {
         drawImageDMA(game_ball.x, game_ball.y, game_ball.width, game_ball.height, ball);
         drawImageDMA(defender_1.x, defender_1.y, 8, 16, defender);
         drawImageDMA(defender_2.x, defender_2.y, 8, 16, defender);
+        drawImageDMA(defender_3.x, defender_3.y, 8, 16, defender);
+        drawImageDMA(defender_4.x, defender_4.y, 8, 16, defender);
         drawImageDMA(60, 220, 20, 40, goal);
 
         if (KEY_DOWN(BUTTON_LEFT, BUTTONS) && game_ball.y > 0) {
@@ -228,8 +239,49 @@ int main(void) {
           state = START;
         }
 
-        if ((vBlankCounter % 5 == 0) && (defender_2.x > 40)) {
+        if ((vBlankCounter % 2 == 0) && goalie_direction) {
           defender_2.x += 1;
+        }
+        
+        if ((vBlankCounter % 2 == 0) && !goalie_direction) {
+          defender_2.x -= 1;
+        }
+
+        if (defender_2.x >= 84) {
+          goalie_direction = 0;
+        }
+        if (defender_2.x < 60) {
+          goalie_direction = 1;
+        }
+
+        if ((vBlankCounter % 1 == 0) && top_defender_direction) {
+          defender_3.y += 1;
+        }
+        
+        if ((vBlankCounter % 1 == 0) && !top_defender_direction) {
+          defender_3.y -= 1;
+        }
+
+        if (defender_3.y >= 150) {
+          top_defender_direction = 0;
+        }
+        if (defender_3.y < 50) {
+          top_defender_direction = 1;
+        }
+
+        if ((vBlankCounter % 1 == 0) && bottom_defender_direction) {
+          defender_4.y += 1;
+        }
+        
+        if ((vBlankCounter % 1 == 0) && !bottom_defender_direction) {
+          defender_4.y -= 1;
+        }
+
+        if (defender_4.y >= 150) {
+          bottom_defender_direction = 0;
+        }
+        if (defender_4.y < 50) {
+          bottom_defender_direction = 1;
         }
 
         if (vBlankCounter % 60 == 0) {
@@ -240,7 +292,10 @@ int main(void) {
         sprintf(timeThree, "Timer: %d", timer);
         drawString(150, 5, timeThree, BLACK);
 
-        if (timer == 0 || ((game_ball.x + game_ball.width >= defender_1.x && game_ball.x <= defender_1.x + defender_1.height) && (game_ball.y + game_ball.height >= defender_1.y && game_ball.y <= defender_1.y + defender_1.width))) {
+        if (timer == 0 || ((game_ball.x + game_ball.width >= defender_1.x && game_ball.x <= defender_1.x + defender_1.height) && (game_ball.y + game_ball.height >= defender_1.y && game_ball.y <= defender_1.y + defender_1.width))
+         || ((game_ball.x + game_ball.width >= defender_2.x && game_ball.x <= defender_2.x + defender_2.height) && (game_ball.y + game_ball.height >= defender_2.y && game_ball.y <= defender_2.y + defender_2.width))
+         || ((game_ball.x + game_ball.width >= defender_3.x && game_ball.x <= defender_3.x + defender_3.height) && (game_ball.y + game_ball.height >= defender_3.y && game_ball.y <= defender_3.y + defender_3.width))
+         || (((game_ball.x + game_ball.width >= defender_4.x && game_ball.x <= defender_4.x + defender_4.height) && (game_ball.y + game_ball.height >= defender_4.y && game_ball.y <= defender_4.y + defender_4.width)))) {
           state = LOSE;
         }
 
