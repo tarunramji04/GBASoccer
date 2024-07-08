@@ -6,3 +6,6 @@ App.sav
 *.o
 
 client
+
+mGBA.exe
+GBAServer.jar
