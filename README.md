@@ -1,6 +1,6 @@
 # GBASoccer
 
-GBASoccer is a game for the Game Boy Advance that uses a state machine to navigate display, accesses GBA devices such as the screen, DMA, and buttons through memory-mapped I/O, and utilizes bit manipulation and optimization techniques to create a tear-free experience.
+GBASoccer is a game for the Game Boy Advance that uses a state machine to navigate display, accesses GBA components such as the screen, DMA, and buttons through memory-mapped I/O, and utilizes bit manipulation and optimization techniques to create a tear-free experience.
 
 How the Game Works
 - The purpose of the game is to score a goal before the timer (displayed on the screen) runs out and without colliding into a moving defender.
